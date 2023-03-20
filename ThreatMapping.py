@@ -11,9 +11,13 @@ st.set_page_config(layout="wide")
 def create_node_map(data):
     G = nx.Graph()
     for key in data:
-        for value in data[key]:
-            G.add_edge(key, value)
+        if isinstance(data[key], Iterable) and not isinstance(data[key], str):
+            for value in data[key]:
+                G.add_edge(key, value)
+        else:
+            G.add_edge(key, data[key])
     return G
+
 
 # Define function to create Altair chart from networkx graph
 def create_altair_chart(G):
