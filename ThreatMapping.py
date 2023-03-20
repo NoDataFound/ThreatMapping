@@ -1,46 +1,65 @@
 import streamlit as st
 import json
-import pandas as pd
+import networkx as nx
+import matplotlib.pyplot as plt
 
-# Function to load JSON file
-def load_json(file):
-    data = json.loads(file.read().decode('utf-8'))
+# Define a function to load and parse the JSON file
+def load_json_file(json_file):
+    with open(json_file) as f:
+        data = json.load(f)
     return data
 
-# Function to load text file containing key names
-def load_text(file):
-    with file:
-        keys = file.read().decode('utf-8')
-        keys = [line.strip() for line in file]
-    return keys
+# Define a function to create a node map
+def create_node_map(data):
+    G = nx.DiGraph()
+    for key in data:
+        G.add_node(key)
+        for value in data[key]:
+            G.add_edge(key, value)
+    return G
 
-# Streamlit app code
-st.title('JSON Visualization and Prioritization')
+# Define the Streamlit app
+def main():
+    # Set the title and description
+    st.set_page_config(page_title="JSON Node Map Visualizer", page_icon=":eyes:")
+    st.title("JSON Node Map Visualizer")
+    st.markdown("""
+        This app allows you to upload a JSON file and visualize it as a node map and all Streamlit visualization types.
+    """)
 
-# File uploader for JSON file
-json_file = st.file_uploader('Upload JSON file', type='json')
+    # Add a file uploader
+    uploaded_file = st.file_uploader("Choose a JSON file", type=["json"])
 
-# File uploader for text file containing key names
-text_file = st.file_uploader('Upload text file containing key names', type='txt')
+    # Check if a file has been uploaded
+    if uploaded_file is not None:
+        # Load the JSON file
+        data = load_json_file(uploaded_file)
 
-if json_file and text_file:
-    # Load JSON data
-    data = load_json(json_file)
+        # Create a node map
+        G = create_node_map(data)
 
-    # Load key names from text file
-    keys = load_text(text_file)
+        # Visualize the node map
+        st.subheader("Node Map Visualization")
+        fig, ax = plt.subplots(figsize=(10, 10))
+        nx.draw(G, with_labels=True, ax=ax)
+        st.pyplot(fig)
 
-    # Count occurrences of key names in JSON data
-    key_counts = {}
-    for key in keys:
-        count = sum(1 for obj in data if key in obj)
-        key_counts[key] = count
+        # Visualize all Streamlit visualization types
+        st.subheader("Streamlit Visualization Types")
+        st.write("This is a sample text.")
+        st.markdown("This is a sample markdown.")
+        st.latex(r"\int_{a}^{b} x^2 dx")
+        st.header("This is a sample header.")
+        st.subheader("This is a sample subheader.")
+        st.code("print('This is a sample code.')", language="python")
+        st.json(data)
+        st.table(data)
+        st.dataframe(data)
+        st.line_chart(data)
+        st.area_chart(data)
+        st.bar_chart(data)
+        st.pyplot(fig)
 
-    # Sort key counts in descending order
-    sorted_counts = sorted(key_counts.items(), key=lambda x: x[1], reverse=True)
-
-    # Create dataframe of key counts
-    df = pd.DataFrame(sorted_counts, columns=['Key', 'Count'])
-
-    # Bar chart of key counts
-    st.bar_chart(df)
+# Run the Streamlit app
+if __name__ == "__main__":
+    main()
