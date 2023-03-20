@@ -12,14 +12,18 @@ def load_json_file(uploaded_file):
 def create_node_map(data):
     G = nx.DiGraph()
     for key in data:
-        G.add_node(key)
+        G.add_node(str(key))  # Convert key to string to make it hashable
         value = data[key]
         if isinstance(value, (list, tuple)):
             for v in value:
-                G.add_edge(key, v)
+                G.add_edge(str(key), str(v))  # Convert key and value to string to make them hashable
+        elif isinstance(value, dict):
+            for k, v in value.items():
+                G.add_edge(str(key), f"{str(k)}={str(v)}")  # Convert key, subkey and value to string to make them hashable
         else:
-            G.add_edge(key, value)
+            G.add_edge(str(key), str(value))  # Convert key and value to string to make them hashable
     return G
+
 
 
 # Define the Streamlit app
