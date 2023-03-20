@@ -10,7 +10,12 @@ def create_node_map(data):
     for key in data:
         if isinstance(data[key], Iterable) and not isinstance(data[key], str):
             for value in data[key]:
+                if isinstance(value, dict):
+                    value = tuple(sorted(value.items()))
                 G.add_edge(key, value)
+        elif isinstance(data[key], dict):
+            data[key] = tuple(sorted(data[key].items()))
+            G.add_edge(key, data[key])
         else:
             G.add_edge(key, data[key])
     return G
