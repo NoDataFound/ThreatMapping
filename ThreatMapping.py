@@ -90,4 +90,59 @@ def create_plotly_figure(G):
 
 
 # Define a function to create an Altair chart from a networkx graph
-def create_altair_chart
+def create_altair_chart(G):
+    nodes = pd.DataFrame.from_dict(dict(G.nodes(data=True)), orient='index').reset_index()
+    nodes.columns = ['id', 'label']
+    edges = pd.DataFrame(list(G.edges), columns=['source', 'target'])
+    graph = alt.Graph(data=edges, 
+                      nodes=alt.Data(name='nodes', values=nodes), 
+                      links=alt.Data(name='edges', values=edges),
+                      width=600,
+                      height=400)
+    node_hover = alt.selection_single(on='mouseover', nearest=True, empty='none')
+    node_base = graph.mark_circle(size=200, stroke='black', strokeWidth=1).encode(
+        alt.Color('degree:Q', scale=alt.Scale(scheme='viridis')),
+        tooltip='id:N'
+    ).transform_calculate(
+        degree='length(links)'
+    ).add_selection(node_hover)
+
+    node_label = graph.mark_text().encode(
+        x='x:Q',
+        y='y:Q',
+        text='label:N',
+        opacity=alt.condition(node_hover, alt.value(1), alt.value(0))
+    ).transform_calculate(
+        label='datum.label',
+        x='scale("x", datum.x)',
+        y='scale("y", datum.y)'
+    )
+
+    graph_final = (node_base + node_label).configure_view(strokeWidth=0)
+    return graph_final
+
+
+# Define the Streamlit app
+def app():
+    # Set page title and layout
+    st.set_page_config(page_title='JSON Node Map', layout='wide')
+
+    # Add a title and file uploader
+    st.title('JSON Node Map')
+    uploaded_file = st.file_uploader('Upload JSON file', type=['json'])
+
+    # If file is uploaded, load and parse the JSON file
+    if uploaded_file is not None:
+        data = load_json_file(uploaded_file)
+
+        # Create a node map using NetworkX and Plotly
+        st.header('Node Map with Plotly')
+        G = create_node_map(data)
+        fig = create_plotly_figure(G)
+        st.plotly_chart(fig, use_container_width=True)
+
+        # Create a node map using NetworkX and Altair
+        st.header('Node Map with Altair')
+        chart = create_altair_chart(G)
+        st.altair_chart(chart, use_container_width=True)
+
