@@ -4,4 +4,3 @@ matplotlib
 altair
 networkx
 plotly
-collections.abc
