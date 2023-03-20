@@ -13,9 +13,14 @@ def create_node_map(data):
     G = nx.DiGraph()
     for key in data:
         G.add_node(key)
-        for value in data[key]:
+        value = data[key]
+        if isinstance(value, (list, tuple)):
+            for v in value:
+                G.add_edge(key, v)
+        else:
             G.add_edge(key, value)
     return G
+
 
 # Define the Streamlit app
 def main():
