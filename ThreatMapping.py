@@ -87,8 +87,6 @@ def create_plotly_figure(G):
                         xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
                         yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)))
     return fig
-
-
 # Define a function to create an Altair chart from a networkx graph
 def create_altair_chart(G):
     nodes = pd.DataFrame.from_dict(dict(G.nodes(data=True)), orient='index').reset_index()
