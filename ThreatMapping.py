@@ -6,7 +6,7 @@ import altair as alt
 def parse_json(file):
     data = pd.read_json(file)
     data = data.groupby('category').size().reset_index(name='count')
-    data = data.sort_values('category')
+    data = data.sort_values('count', ascending=False)
     return data
 
 # Define function to create dynamic visualization
@@ -21,7 +21,6 @@ def create_chart(data):
     )
     return chart
 
-
 # Define main function for Streamlit app
 def main():
     st.title('JSON File Visualizer')
@@ -34,3 +33,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
