@@ -5,9 +5,9 @@ import altair as alt
 
 # Function to load JSON file
 def load_json(file):
-    with open(file) as f:
-        data = json.load(f)
+    data = json.loads(file.read().decode('utf-8'))
     return data
+
 
 # Function to load text file containing key names
 def load_key_names(file):
