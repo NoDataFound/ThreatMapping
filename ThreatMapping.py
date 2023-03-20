@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import json
 
-with open('data.json') as f:
+with open('8.8.8.8.json') as f:
     data = json.load(f)
 
 with open('ssc_keys.txt', 'r') as f:
