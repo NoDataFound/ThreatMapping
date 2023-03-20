@@ -25,7 +25,6 @@ def create_node_map(data):
             G.add_edge(key, data[key])
     return G
 
-
 def create_altair_chart(graph):
     source, target = zip(*graph.edges())
     nodes = list(set(source + target))
