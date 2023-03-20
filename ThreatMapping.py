@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 # Define function to parse JSON file
 def parse_json(file):
@@ -11,12 +11,7 @@ def parse_json(file):
 
 # Define function to create static visualization
 def create_chart(data):
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.bar(data['category'], data['count'])
-    ax.set_xlabel('Category')
-    ax.set_ylabel('Count')
-    ax.set_title('Categories by Count')
-    ax.tick_params(axis='x', rotation=90)
+    fig = px.bar(data, x='category', y='count', color='category')
     return fig
 
 # Define main function for Streamlit app
@@ -27,7 +22,7 @@ def main():
         data = parse_json(file)
         st.write(data)
         fig = create_chart(data)
-        st.pyplot(fig)
+        st.plotly_chart(fig)
 
 if __name__ == '__main__':
     main()
