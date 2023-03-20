@@ -12,13 +12,19 @@ def create_node_map(data):
             for value in data[key]:
                 if isinstance(value, dict):
                     value = tuple(sorted(value.items()))
+                elif isinstance(value, list):
+                    value = frozenset(value)
                 G.add_edge(key, value)
         elif isinstance(data[key], dict):
             data[key] = tuple(sorted(data[key].items()))
             G.add_edge(key, data[key])
+        elif isinstance(data[key], list):
+            data[key] = frozenset(data[key])
+            G.add_edge(key, data[key])
         else:
             G.add_edge(key, data[key])
     return G
+
 
 def create_altair_chart(graph):
     source, target = zip(*graph.edges())
