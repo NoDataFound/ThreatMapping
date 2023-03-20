@@ -1,8 +1,9 @@
-import streamlit as st
+from collections.abc import Iterable
 import json
-import pandas as pd
 import networkx as nx
 import altair as alt
+import pandas as pd
+import streamlit as st
 
 # Set page config
 st.set_page_config(layout="wide")
