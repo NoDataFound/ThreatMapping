@@ -1,12 +1,16 @@
 import streamlit as st
-import json
 import networkx as nx
-import matplotlib.pyplot as plt
+import json
+import plotly.graph_objects as go
+import altair as alt
+import pandas as pd
+
 
 # Define a function to load and parse the JSON file
 def load_json_file(uploaded_file):
     data = json.loads(uploaded_file.read().decode("utf-8"))
     return data
+
 
 # Define a function to create a node map
 def create_node_map(data):
@@ -25,49 +29,65 @@ def create_node_map(data):
     return G
 
 
+# Define a function to create a Plotly figure from a networkx graph
+def create_plotly_figure(G):
+    pos = nx.spring_layout(G)
+    edge_x = []
+    edge_y = []
+    for edge in G.edges():
+        x0, y0 = pos[edge[0]]
+        x1, y1 = pos[edge[1]]
+        edge_x.extend([x0, x1, None])
+        edge_y.extend([y0, y1, None])
+    node_x = []
+    node_y = []
+    node_text = []
+    for node in G.nodes():
+        x, y = pos[node]
+        node_x.append(x)
+        node_y.append(y)
+        node_text.append(node)
+    edge_trace = go.Scatter(
+        x=edge_x, y=edge_y,
+        line=dict(width=0.5, color='#888'),
+        hoverinfo='none',
+        mode='lines')
+    node_trace = go.Scatter(
+        x=node_x, y=node_y,
+        mode='markers',
+        hoverinfo='text',
+        marker=dict(
+            showscale=False,
+            colorscale='YlGnBu',
+            reversescale=True,
+            color=[],
+            size=10,
+            colorbar=dict(
+                thickness=15,
+                title='Node Connections',
+                xanchor='left',
+                titleside='right'
+            ),
+            line_width=2))
+    node_trace.text = node_text
+    for node, adjacencies in enumerate(G.adjacency()):
+        node_trace.marker.color.append(len(adjacencies[1]))
+    fig = go.Figure(data=[edge_trace, node_trace],
+                    layout=go.Layout(
+                        title='<br>Node map of JSON data',
+                        titlefont_size=16,
+                        showlegend=False,
+                        hovermode='closest',
+                        margin=dict(b=20, l=5, r=5, t=40),
+                        annotations=[dict(
+                            text="",
+                            showarrow=False,
+                            xref="paper", yref="paper",
+                            x=0.005, y=-0.002)],
+                        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)))
+    return fig
 
-# Define the Streamlit app
-def main():
-    # Set the title and description
-    st.set_page_config(page_title="JSON Node Map Visualizer", page_icon=":eyes:")
-    st.title("JSON Node Map Visualizer")
-    st.markdown("""
-        This app allows you to upload a JSON file and visualize it as a node map and all Streamlit visualization types.
-    """)
 
-    # Add a file uploader
-    uploaded_file = st.file_uploader("Choose a JSON file", type=["json"])
-
-    # Check if a file has been uploaded
-    if uploaded_file is not None:
-        # Load the JSON file
-        data = load_json_file(uploaded_file)
-
-        # Create a node map
-        G = create_node_map(data)
-
-        # Visualize the node map
-        st.subheader("Node Map Visualization")
-        fig, ax = plt.subplots(figsize=(10, 10))
-        nx.draw(G, with_labels=True, ax=ax)
-        st.pyplot(fig)
-
-        # Visualize all Streamlit visualization types
-        st.subheader("Streamlit Visualization Types")
-        st.write("This is a sample text.")
-        st.markdown("This is a sample markdown.")
-        st.latex(r"\int_{a}^{b} x^2 dx")
-        st.header("This is a sample header.")
-        st.subheader("This is a sample subheader.")
-        st.code("print('This is a sample code.')", language="python")
-        st.json(data)
-        st.table(data)
-        st.dataframe(data)
-        st.line_chart(data)
-        st.area_chart(data)
-        st.bar_chart(data)
-        st.pyplot(fig)
-
-# Run the Streamlit app
-if __name__ == "__main__":
-    main()
+# Define a function to create an Altair chart from a networkx graph
+def create_altair_chart
