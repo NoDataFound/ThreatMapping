@@ -1,28 +1,32 @@
 import streamlit as st
-import pandas as pd
-import plotly.express as px
+import networkx as nx
+import matplotlib.pyplot as plt
+from io import StringIO
 
-# Define function to parse JSON file
-def parse_json(file):
-    data = pd.read_json(file)
-    data = data.groupby('category').size().reset_index(name='count')
-    data = data.sort_values('count', ascending=False)
-    return data
+def load_json(json_str):
+    G = nx.Graph()
+    data = json.loads(json_str)
+    for node, adj_list in data.items():
+        for adj_node in adj_list:
+            G.add_edge(node, adj_node)
+    return G
 
-# Define function to create static visualization
-def create_chart(data):
-    fig = px.bar(data, x='category', y='count', color='category')
-    return fig
+def draw_graph(graph):
+    pos = nx.spring_layout(graph)
+    nx.draw(graph, pos, with_labels=True)
+    plt.show()
 
-# Define main function for Streamlit app
-def main():
-    st.title('JSON File Visualizer')
-    file = st.file_uploader('Upload JSON file', type='json')
-    if file:
-        data = parse_json(file)
-        st.write(data)
-        fig = create_chart(data)
-        st.plotly_chart(fig)
+st.title("Nodemap Visualizer")
 
-if __name__ == '__main__':
-    main()
+# Allow user to upload a JSON file
+json_file = st.file_uploader("Upload a JSON file", type=["json"])
+
+if json_file is not None:
+    # Load the JSON data
+    json_str = json_file.read().decode("utf-8")
+
+    # Convert JSON data to NetworkX graph
+    graph = load_json(json_str)
+
+    # Draw the nodemap
+    draw_graph(graph)
