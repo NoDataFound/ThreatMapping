@@ -5,6 +5,8 @@ import altair as alt
 # Define function to parse JSON file
 def parse_json(file):
     data = pd.read_json(file)
+    data = data.groupby('category').size().reset_index(name='count')
+    data = data.sort_values('category')
     return data
 
 # Define function to create dynamic visualization
@@ -16,20 +18,6 @@ def create_chart(data):
     ).properties(
         width=600,
         height=400
-    ).transform_aggregate(
-        count='count()',
-        groupby=['category']
-    ).transform_window(
-        rank='rank(count)',
-        sort=[alt.SortField('count', order='descending')]
-    ).transform_filter(
-        alt.datum.rank <= 10
-    ).transform_window(
-        index='row_number()'
-    ).transform_filter(
-        alt.datum.index <= 10
-    ).properties(
-        title='Top 10 Categories by Count'
     )
     return chart
 
