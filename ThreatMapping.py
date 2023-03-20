@@ -10,6 +10,7 @@ def load_json(file):
 # Function to load text file containing key names
 def load_text(file):
     with file:
+        keys = file.read().decode('utf-8')
         keys = [line.strip() for line in file]
     return keys
 
