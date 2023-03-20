@@ -4,9 +4,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 # Define a function to load and parse the JSON file
-def load_json_file(json_file):
-    with open(json_file) as f:
-        data = json.load(f)
+def load_json_file(uploaded_file):
+    data = json.loads(uploaded_file.read().decode("utf-8"))
     return data
 
 # Define a function to create a node map
