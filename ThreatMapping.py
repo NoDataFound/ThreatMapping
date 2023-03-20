@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import altair as alt
+import matplotlib.pyplot as plt
 
 # Define function to parse JSON file
 def parse_json(file):
@@ -9,17 +9,15 @@ def parse_json(file):
     data = data.sort_values('count', ascending=False)
     return data
 
-# Define function to create dynamic visualization
+# Define function to create static visualization
 def create_chart(data):
-    chart = alt.Chart(data).mark_bar().encode(
-        x=alt.X('category:N', sort='-y'),
-        y=alt.Y('count:Q'),
-        color=alt.Color('category:N')
-    ).properties(
-        width=600,
-        height=400
-    )
-    return chart
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.bar(data['category'], data['count'])
+    ax.set_xlabel('Category')
+    ax.set_ylabel('Count')
+    ax.set_title('Categories by Count')
+    ax.tick_params(axis='x', rotation=90)
+    return fig
 
 # Define main function for Streamlit app
 def main():
@@ -28,9 +26,8 @@ def main():
     if file:
         data = parse_json(file)
         st.write(data)
-        chart = create_chart(data)
-        st.altair_chart(chart, use_container_width=True)
+        fig = create_chart(data)
+        st.pyplot(fig)
 
 if __name__ == '__main__':
     main()
-
