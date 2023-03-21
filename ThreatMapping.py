@@ -1,33 +1,31 @@
 import streamlit as st
-import json
 import networkx as nx
 import matplotlib.pyplot as plt
-from io import StringIO
+from networkx.readwrite import json_graph
 
-def load_json(json_str):
-    G = nx.Graph()
-    data = json.loads(json_str)
-    for node, adj_list in data.items():
-        for adj_node in adj_list:
-            G.add_edge(node, adj_node)
-    return G
+# Set page title and description
+st.set_page_config(page_title="JSON Node Graph", page_icon=":bar_chart:", layout="wide")
+st.title("JSON Node Graph")
 
-def draw_graph(graph):
+# Upload JSON file
+uploaded_file = st.file_uploader("Choose a JSON file", type="json")
+
+if uploaded_file is not None:
+    # Load JSON data
+    data = json.load(uploaded_file)
+
+    # Create NetworkX graph from JSON data
+    graph = json_graph.node_link_graph(data)
+
+    # Draw graph using NetworkX and Matplotlib
     pos = nx.spring_layout(graph)
-    nx.draw(graph, pos, with_labels=True)
-    plt.show()
+    nx.draw_networkx_nodes(graph, pos, node_size=100, node_color='r', alpha=0.8)
+    nx.draw_networkx_edges(graph, pos, alpha=0.5)
+    nx.draw_networkx_labels(graph, pos, font_size=8, font_family='sans-serif')
+    plt.axis('off')
+    st.pyplot()
 
-st.title("Nodemap Visualizer")
+    # Show raw JSON data
+    st.subheader("Raw JSON data")
+    st.json(data)
 
-# Allow user to upload a JSON file
-json_file = st.file_uploader("Upload a JSON file", type=["json"])
-
-if json_file is not None:
-    # Load the JSON data
-    json_str = json_file.read().decode("utf-8")
-
-    # Convert JSON data to NetworkX graph
-    graph = load_json(json_str)
-
-    # Draw the nodemap
-    draw_graph(graph)
