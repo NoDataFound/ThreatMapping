@@ -8,12 +8,10 @@ st.text('This app allows you to upload a JSON file and visualize it with a node 
 
 # Get JSON file from user
 json_file = st.file_uploader('Upload a JSON file', type = 'json')
-if json_file is not None:
-    # Load the JSON file
-    with open(json_file) as f:
-        data = json.load(f)
 
-    # Generate graph from JSON data  
+# Define a function to load and parse the JSON file
+def load_json_file(uploaded_file):
+    data = json.loads(uploaded_file.read().decode("utf-8"))    # Generate graph from JSON data  
     G = nx.Graph(data)
 
     # Draw graph 
