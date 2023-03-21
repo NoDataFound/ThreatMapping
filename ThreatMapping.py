@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 st.title('JSON Node Graph Visualizer')
 st.text('This app allows you to upload a JSON file and visualize it with a node graph')
 
-# Get JSON file from user
-json_file = st.file_uploader('Upload a JSON file', type = 'json')
 
 # Define a function to load and parse the JSON file
 def load_json_file(uploaded_file):
