@@ -7,7 +7,6 @@ def load_json(contents):
     data = json.loads(contents)
     return data
 
-
 def build_graph(data):
     G = nx.DiGraph()
 
@@ -29,7 +28,6 @@ def build_graph(data):
 
     return G
 
-
 def visualize_graph(G):
     dot_str = nx.drawing.nx_pydot.to_pydot(G).to_string()
     try:
@@ -39,9 +37,8 @@ def visualize_graph(G):
             st.graphviz_chart(graph[0].to_string())
         else:
             st.write("Error while visualizing graph: Graph object is None.")
-    except pydot.PyDotParseException as e:
-        st.write(f"Error while visualizing graph: {e}")
-
+    except pydot.InvocationException as e:
+        st.write("Error while visualizing graph:", str(e))
 
 def main():
     st.title("Attack Flow Visualizer")
@@ -58,7 +55,6 @@ def main():
         G = build_graph(data)
         st.write("Your attack flow visual:")
         visualize_graph(G)
-
 
 if __name__ == "__main__":
     main()
