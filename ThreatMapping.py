@@ -2,6 +2,7 @@ import streamlit as st
 import json
 import networkx as nx
 import pydotplus
+import pydot
 
 
 def load_json(contents):
