@@ -1,7 +1,7 @@
 import streamlit as st
 import json
 import networkx as nx
-import pydot
+import pygraphviz as pgv
 
 
 def load_json(contents):
@@ -32,15 +32,11 @@ def build_graph(data):
 
 
 def visualize_graph(G):
-    dot_str = nx.nx_agraph.to_agraph(G).to_string()
-    graph = pydot.graph_from_dot_data(dot_str)
-    if graph is not None:
-        graph[0].set('dpi', '300')
-        st.graphviz_chart(graph[0].to_string())
-    else:
-        st.write("Error while visualizing graph")
-
-
+    dot_str = nx.drawing.nx_agraph.to_agraph(G).to_string()
+    graph = pgv.AGraph(dot_str)
+    graph.layout(prog="dot")
+    graph.draw("graph.png")
+    st.image("graph.png")
 
 
 def main():
