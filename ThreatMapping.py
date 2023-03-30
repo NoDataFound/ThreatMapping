@@ -32,9 +32,12 @@ def build_graph(data):
 
 def visualize_graph(G):
     dot_str = nx.drawing.nx_pydot.to_pydot(G).to_string()
-    graph = pydotplus.graph_from_dot_data(dot_str)
-    graph.set('dpi', '300')
-    st.graphviz_chart(graph.to_string())
+    graph = pydot.graph_from_dot_data(dot_str)
+    if graph is not None:
+        graph[0].set('dpi', '300')
+        st.graphviz_chart(graph[0].to_string())
+    else:
+        st.write("Error while visualizing graph: Graph object is None.")
 
 
 
