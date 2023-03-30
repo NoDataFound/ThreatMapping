@@ -4,9 +4,8 @@ import networkx as nx
 import pydot
 
 
-def load_json(json_file):
-    with open(json_file, "r") as f:
-        data = json.load(f)
+def load_json(contents):
+    data = json.loads(contents)
     return data
 
 
@@ -33,7 +32,8 @@ def main():
     uploaded_file = st.file_uploader("Choose a file")
 
     if uploaded_file is not None:
-        data = load_json(uploaded_file)
+        contents = uploaded_file.read()
+        data = load_json(contents)
         st.write("Your file has been loaded!")
         st.write(data)
 
