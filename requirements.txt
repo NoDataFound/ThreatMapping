@@ -1,6 +1,3 @@
 streamlit
-pandas
-matplotlib
-altair
 networkx
-plotly
+networkx-multidigraph-renderer
