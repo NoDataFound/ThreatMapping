@@ -1,7 +1,7 @@
 import streamlit as st
 import json
 import networkx as nx
-import pygraphviz as pgv
+import pydotplus
 
 
 def load_json(contents):
@@ -30,13 +30,13 @@ def build_graph(data):
 
     return G
 
-
 def visualize_graph(G):
-    dot_str = nx.drawing.nx_agraph.to_agraph(G).to_string()
-    graph = pgv.AGraph(dot_str)
-    graph.layout(prog="dot")
-    graph.draw("graph.png")
-    st.image("graph.png")
+    dot_str = nx.drawing.nx_pydot.to_pydot(G).to_string()
+    graph = pydotplus.graph_from_dot_data(dot_str)
+    graph.set('dpi', '300')
+    img = graph.create_png()
+    st.image(img, use_column_width=True)
+
 
 
 def main():
