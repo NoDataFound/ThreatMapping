@@ -33,9 +33,15 @@ def build_graph(data):
 
 def visualize_graph(G):
     dot_str = nx.drawing.nx_pydot.to_pydot(G).to_string()
-    graph = pydot.graph_from_dot_data(dot_str)
-    graph[0].set('dpi', '300')
-    st.graphviz_chart(graph[0].to_string())
+    st.write("DOT string:")
+    st.write(dot_str)
+    try:
+        graph = pydot.graph_from_dot_data(dot_str)
+        graph[0].set('dpi', '300')
+        st.graphviz_chart(graph[0].to_string())
+    except Exception as e:
+        st.write("Error while visualizing graph:", e)
+
 
 
 def main():
