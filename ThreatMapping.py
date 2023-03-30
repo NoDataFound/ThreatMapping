@@ -18,7 +18,7 @@ def build_graph(data):
     # Extract the steps and targets from the JSON data
     for step in data["facets"]["mitreTechniques"]:
         steps.append(step["name"])
-        targets.extend(step["subtechniques"])
+        targets.extend(step["name"])
 
     # Add the steps as nodes in the graph
     for step in steps:
