@@ -10,11 +10,24 @@ def load_json(contents):
 
 
 def build_graph(data):
-    G = nx.MultiDiGraph()
-    for step in data["steps"]:
-        G.add_node(step["name"], label=step["name"])
-        for target in step["targets"]:
-            G.add_edge(step["name"], target)
+    G = nx.DiGraph()
+
+    steps = []
+    targets = []
+
+    # Extract the steps and targets from the JSON data
+    for step in data["facets"]["mitreTechniques"]:
+        steps.append(step["name"])
+        targets.extend(step["subtechniques"])
+
+    # Add the steps as nodes in the graph
+    for step in steps:
+        G.add_node(step)
+
+    # Add the targets as edges in the graph
+    for target in targets:
+        G.add_edge(target, target.split(".")[0])
+
     return G
 
 
