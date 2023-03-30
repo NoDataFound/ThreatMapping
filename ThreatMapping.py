@@ -1,8 +1,7 @@
 import streamlit as st
 import json
 import networkx as nx
-import pydotplus
-import pydot
+from networkx.drawing.nx_agraph import to_agraph
 
 
 def load_json(contents):
@@ -33,11 +32,14 @@ def build_graph(data):
 
 
 def visualize_graph(G):
-    dot_str = nx.drawing.nx_pydot.to_pydot(G).to_string()
-    graph = pydotplus.graph_from_dot_data(dot_str)
+    graph = to_agraph(G)
     if graph is not None:
-        graph.set('dpi', '300')
-        st.graphviz_chart(graph.to_string())
+        graph.node_attr.update(fontname="Arial", fontsize="10")
+        graph.edge_attr.update(fontname="Arial", fontsize="10")
+        graph.graph_attr.update(fontname="Arial", fontsize="12")
+        graph.draw(format="png", prog="dot")
+        img = graph.draw(format="png", prog="dot")
+        st.image(img)
     else:
         st.write("Error while visualizing graph: Graph object is None.")
 
