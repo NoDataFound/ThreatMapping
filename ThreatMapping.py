@@ -1,33 +1,48 @@
 import streamlit as st
 import json
 import networkx as nx
-import matplotlib.pyplot as plt
-import tempfile
+from networkx.drawing.nx_agraph import graphviz_layout
+from nxpd import draw
+from nxpd import nxpdParams
+from nxpd import nxpd
 
-st.title('JSON Node Graph Visualizer')
-st.text('This app allows you to upload a JSON file and visualize it with a node graph')
 
-# Get JSON file from user
-json_file = st.file_uploader('Upload a JSON file', type = 'json')
-if json_file is not None:
-    # Save the file to a temporary directory
-    temp_file = tempfile.NamedTemporaryFile(delete=False)
-    temp_file.write(json_file.read())
-    temp_file.close()
-
-    # Load the JSON file
-    with open(temp_file.name) as f:
+def load_json(json_file):
+    with open(json_file, "r") as f:
         data = json.load(f)
+    return data
 
-    # Generate graph from JSON data  
-    G = nx.Graph(data)
 
-    # Draw graph 
-    plt.figure(figsize=(8, 8)) 
-    nx.draw_networkx(G, with_labels=True, node_color='skyblue', node_size=1200, alpha=0.5, linewidths=5, font_size=16) 
+def build_graph(data):
+    G = nx.MultiDiGraph()
+    for step in data["steps"]:
+        G.add_node(step["name"], label=step["name"])
+        for target in step["targets"]:
+            G.add_edge(step["name"], target)
+    return G
 
-    # Show graph in Streamlit app 
-    st.pyplot()
 
-    # Delete the temporary file
-    os.unlink(temp_file.name)
+def visualize_graph(G):
+    pos = graphviz_layout(G, prog="dot")
+    nxpdParams['show'] = 'ipynb'
+    draw(G, pos=pos, show=True, format='png')
+
+
+def main():
+    st.title("Attack Flow Visualizer")
+    st.write("Upload your JSON file below")
+
+    uploaded_file = st.file_uploader("Choose a file")
+
+    if uploaded_file is not None:
+        data = load_json(uploaded_file)
+        st.write("Your file has been loaded!")
+        st.write(data)
+
+        G = build_graph(data)
+        st.write("Your attack flow visual:")
+        visualize_graph(G)
+
+
+if __name__ == "__main__":
+    main()
