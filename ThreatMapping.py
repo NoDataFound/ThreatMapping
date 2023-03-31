@@ -1,60 +1,25 @@
 import streamlit as st
 import json
-import networkx as nx
-import pydot
+import stix2
 
-def load_json(contents):
-    data = json.loads(contents)
-    return data
-
-def build_graph(data):
-    G = nx.DiGraph()
-
-    steps = []
-    targets = []
-
-    # Extract the steps and targets from the JSON data
-    for step in data["facets"]["mitreTechniques"]:
-        steps.append(step["name"])
-        targets.extend(step["name"])
-
-    # Add the steps as nodes in the graph
-    for step in steps:
-        G.add_node(step)
-
-    # Add the targets as edges in the graph
-    for target in targets:
-        G.add_edge(target, target.split(".")[0])
-
-    return G
-
-def visualize_graph(G):
-    dot_str = nx.drawing.nx_pydot.to_pydot(G).to_string()
+st.set_page_config(page_title="JSON to STIX 2.0 Converter")
+def json_to_stix(json_data):
     try:
-        graph = pydot.graph_from_dot_data(dot_str)
-        if graph is not None:
-            graph[0].set('dpi', '300')
-            st.graphviz_chart(graph[0].to_string())
-        else:
-            st.write("Error while visualizing graph: Graph object is None.")
-    except pydot.InvocationException as e:
-        st.write("Error while visualizing graph:", str(e))
+        data = json.loads(json_data)
+        stix_data = stix2.parse(data)
+        return stix_data
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 def main():
-    st.title("Attack Flow Visualizer")
-    st.write("Upload your JSON file below")
-
-    uploaded_file = st.file_uploader("Choose a file")
-
-    if uploaded_file is not None:
-        contents = uploaded_file.read()
-        data = load_json(contents)
-        st.write("Your file has been loaded!")
-        st.write(data)
-
-        G = build_graph(data)
-        st.write("Your attack flow visual:")
-        visualize_graph(G)
-
+    st.title("JSON to STIX Converter")
+    json_file = st.file_uploader("Upload a JSON file", type=["json"])
+    if json_file is not None:
+        json_data = json_file.read().decode("utf-8")
+        stix_data = json_to_stix(json_data)
+        if isinstance(stix_data, str):
+            st.error(stix_data)
+        else:
+            st.json(stix_data)
 if __name__ == "__main__":
     main()
