@@ -1,3 +1,2 @@
 streamlit
-networkx
-pydotplus
+stix2
